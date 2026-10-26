@@ -1,18 +1,7 @@
-# Node / Next.js
-node_modules/
-.next/
-out/
-dist/
-*.tsbuildinfo
-npm-debug.log*
-
-# Python
+.env
+.DS_Store
 __pycache__/
 *.py[cod]
-.venv/
-venv/
-
-# OS / editor
-.DS_Store
-.idea/
-.vscode/
+app/node_modules/
+app/.next/
+app/npm-debug.log*

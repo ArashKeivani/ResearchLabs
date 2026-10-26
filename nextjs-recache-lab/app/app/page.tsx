@@ -49,8 +49,9 @@ export default function HomePage() {
         <strong>Training only</strong>
         <p>
           This project intentionally uses vulnerable software and middleware. The cache is published
-          only on localhost, and the Docker network is internal with no external routing. Do not
-          expose this lab to a LAN, public interface, reverse proxy, or the Internet.
+          only on 127.0.0.1; app and mock target traffic use dedicated Docker networks. The cache-edge
+          network exists for the published local endpoint. Do not expose this lab to a LAN, public
+          interface, reverse proxy, or the Internet.
         </p>
       </section>
     </main>

@@ -9,8 +9,12 @@ services:
       PORT: "3000"
     expose:
       - "3000"
+    # The app can reach the host's payload server through the dedicated bridge gateway.
+    extra_hosts:
+      - "host.docker.internal:${PAYLOAD_GATEWAY:-172.30.250.1}"
     networks:
       - labnet
+      - payload-net
     healthcheck:
       test:
         - CMD
@@ -48,7 +52,7 @@ services:
       ORIGIN_PORT: "3000"
       LISTEN_HOST: 0.0.0.0
       LISTEN_PORT: "8080"
-      CACHE_TTL_SECONDS: "600"
+      CACHE_TTL_SECONDS: "${CACHE_TTL_SECONDS:-600}"
     depends_on:
       app:
         condition: service_healthy
@@ -58,8 +62,29 @@ services:
       - "127.0.0.1:3000:8080"
     networks:
       - labnet
+      - cache-edge
 
 networks:
+  # App <-> cache <-> synthetic internal service. Containers on this network
+  # have no external routing through this network.
   labnet:
     driver: bridge
     internal: true
+    ipam:
+      config:
+        - subnet: ${LAB_SUBNET:-172.29.250.0/24}
+          gateway: ${LAB_GATEWAY:-172.29.250.1}
+
+  # Dedicated internal bridge whose gateway is used by the host-side payload
+  # server. The app resolves host.docker.internal to this gateway.
+  payload-net:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: ${PAYLOAD_SUBNET:-172.30.250.0/24}
+          gateway: ${PAYLOAD_GATEWAY:-172.30.250.1}
+
+  # Separate bridge for the cache's host-published localhost endpoint.
+  cache-edge:
+    driver: bridge
